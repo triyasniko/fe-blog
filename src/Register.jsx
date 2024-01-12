@@ -1,15 +1,23 @@
 // Register.js
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-
+import NavLoginRegister from './NavLoginRegister';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isAuthenticate = localStorage.getItem('access_token');
+    if (isAuthenticate) {
+      // Redirect to home if already logged in
+      navigate('/');
+    }
+  }, []); 
 
   const handleRegister = async () => {
     try {
@@ -93,6 +101,8 @@ const Register = () => {
   };
 
   return (
+    <>
+    <NavLoginRegister />
     <div className="container mt-5">
       <div className="col-md-6 offset-md-3">
         <h2 className="mb-4">Register</h2>
@@ -113,6 +123,7 @@ const Register = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 
