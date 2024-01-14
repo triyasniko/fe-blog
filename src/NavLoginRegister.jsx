@@ -2,15 +2,9 @@ import { Link } from 'react-router-dom';
 
 function NavLoginRegister() {
   return (
-      <div className="d-flex justify-content-center">
-        <ul className="nav nav-tabs mt-2">
-          <li className="nav-item">
-            <Link className="nav-link text-dark rounded-0" to="/login">Login</Link>
-          </li>
-          <li className="nav-item">
-            <Link className="nav-link text-dark rounded-0" to="/register">Register</Link>
-          </li>
-        </ul>
+      <div className="container d-flex justify-content-center flex-column mt-5 w-50">
+            <Link className="btn btn-outline-primary btn-sm my-2" to="/login">Login</Link>
+            <Link className="btn btn-outline-primary btn-sm" to="/register">Register</Link>
       </div>
     );
 }

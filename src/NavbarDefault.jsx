@@ -46,35 +46,35 @@ const NavbarDefault = ({ user }) => {
       console.log(notifications, "sini euyy###");
     
     return (
-        <Navbar bg="light" expand="lg">
-          <Container>
-            <Navbar.Brand href="#home">
-                <p className="pb-2 my-0 text-muted">
-                    Welcome, {user ? user.name : 'Guest'}
-                </p>
-            </Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-              <ul className="navbar-nav ms-auto">
-                <li className="nav-item">
+      <Navbar bg="dark" expand="lg" variant="dark">
+        <Container>
+          <Navbar.Brand href="#home">
+            <p className="pb-2 my-0 text-white">
+              Welcome, {user ? user.name : 'Guest'}
+            </p>
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <ul className="navbar-nav ms-auto">
+              <li className="nav-item">
                 <Dropdown>
-                    <Dropdown.Toggle className="btn-sm border-secondary" variant="light" id="dropdown-basic">
+                  <Dropdown.Toggle className="btn-sm border-secondary" variant="light" id="dropdown-basic">
                     Notifications
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu className="btn-sm">
-                        {renderNotifications()}
-                    </Dropdown.Menu>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu className="btn-sm">
+                    {renderNotifications()}
+                  </Dropdown.Menu>
                 </Dropdown>
-                </li>
-                <li className="nav-item mx-2">
-                  <Button className="btn btn-sm btn-light mb-1 border-secondary" onClick={handleLogout}>
-                    Logout
-                  </Button>
-                </li>
-              </ul>
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
+              </li>
+              <li className="nav-item mx-2">
+                <Button className="btn btn-sm btn-light mb-1 border-secondary" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </li>
+            </ul>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
       );
 };
 

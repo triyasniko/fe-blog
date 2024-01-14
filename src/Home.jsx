@@ -1,16 +1,16 @@
 import React,{ useState, useEffect } from 'react';
-import { Container, Row, Col, Table, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Table, Form, Button, Card } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import NavbarDefault from './NavbarDefault';
-import InsertTask from './InsertTask';
+import InsertJobApplication from './insertJobApplication';
 import Swal from 'sweetalert2';
 
 const Home = () => {
     const navigate = useNavigate();
     const access_token = localStorage.getItem("access_token");
     const [user, setUser] = useState(null);
-    const [tasks, setTasks] = useState([]);
+    const [jobs, setJobs] = useState([]);
 
     const fetchDataUser = async () => {
         try {
@@ -31,32 +31,32 @@ const Home = () => {
             // You might want to redirect or handle the error in a way that makes sense for your application
         }
     };
-    const fetchDataTasks = async () => {
+    const fetchDataJobs = async () => {
         try {
             // console.log(`Bearer ${access_token}`);
             const response = await axios({
                 Accept: 'application/json',
-                url: `${process.env.REACT_APP_API_BASE_URL}/task`,
+                url: `${process.env.REACT_APP_API_BASE_URL}/job`,
                 method: 'get',
                 headers: {
                     'Authorization': `Bearer ${access_token}`
                 }
             });
-             setTasks(response.data.data);
+             setJobs(response.data.data);
              console.log("disiniiii####",response.data);
         } catch (error) {
             // Handle errors, e.g., log the error or show a user-friendly message
-            console.error("Error fetching tasks data:", error);
+            console.error("Error fetching jobs data:", error);
             // You might want to redirect or handle the error in a way that makes sense for your application
         }
     };
-    const handleDelete = (taskId) => {
+    const handleDelete = (applicationId) => {
         // Tampilkan konfirmasi sebelum menghapus
-        const confirmDelete = window.confirm("Are you sure you want to delete this task?");
+        const confirmDelete = window.confirm("Are you sure you want to delete this job?");
     
         if (confirmDelete) {
-            // Implementasi logika penghapusan task di sini
-            axios.delete(`${process.env.REACT_APP_API_BASE_URL}/task/${taskId}`, {
+            // Implementasi logika penghapusan job di sini
+            axios.delete(`${process.env.REACT_APP_API_BASE_URL}/job/${applicationId}`, {
                 headers: {
                   'Authorization': `Bearer ${access_token}`
                 }
@@ -65,11 +65,17 @@ const Home = () => {
                 // Tampilkan SweetAlert setelah penghapusan berhasil
                 Swal.fire({
                   icon: 'success',
-                  title: 'Task Deleted!',
-                  text: `Task with ID ${taskId} has been successfully deleted.`,
+                  title: 'Job Deleted!',
+                  text: `Job with ID ${applicationId} has been successfully deleted.`,
                 })
                 .then(() => {
-                    setTasks(prevTasks => prevTasks.filter(task => task.task_id !== taskId));
+                    // setJobs(prevJobs => prevJobs.filter(job => job.application_id !== applicationId));
+                    setJobs(prevJobs => {
+                      const updatedJobs = prevJobs.filter(job => job.application_id !== applicationId);
+                      console.log('Updated Jobs:', updatedJobs);
+                      return updatedJobs;
+                    });
+                    
                     navigate('/');
                 });
       
@@ -77,20 +83,20 @@ const Home = () => {
               })
               .catch(error => {
                 // Tangani kesalahan saat melakukan permintaan atau kesalahan dari server
-                console.error('Error during task deletion:', error.message);
+                console.error('Error during job deletion:', error.message);
       
                 // Tampilkan SweetAlert jika terjadi kesalahan
                 Swal.fire({
                   icon: 'error',
                   title: 'Error',
-                  text: 'An error occurred during task deletion.',
+                  text: 'An error occurred during job deletion.',
                 });
               });
         }
       };
-      const handleEdit = (taskId) => {
-        // Navigasi ke halaman EditTask.jsx dengan menyertakan taskId sebagai parameter jika diperlukan
-        navigate(`/editTask/${taskId}`);
+      const handleEdit = (applicationId) => {
+        // console.log(applicationId,"#@#@#@#@#@@#");
+        navigate(`/editJobApplication/${applicationId}`);
       };
     //hook useEffect
     useEffect(() => {
@@ -102,7 +108,7 @@ const Home = () => {
         }
         //call function "fetchData"
         fetchDataUser();
-        fetchDataTasks();
+        fetchDataJobs();
     }, []);
     //console.log(user,"#############");
   return (
@@ -113,54 +119,36 @@ const Home = () => {
         <Col md={12}>
             <Link className="btn btn-sm btn-light mb-1 border-secondary" 
             to={{
-                pathname: '/insertTask',
+                pathname: '/insertJobApplication',
                 state: { user: user }
               }}
             
             >
-                Write New Task
+                Insert Job Application
             </Link>
-            {tasks.length > 0 ? (
-              <Table striped hover>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Task Name</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Status</th>
-                    <th>Priority</th>
-                    <th>Due Date</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tasks.map((task, index) => (
-                    <tr key={task.task_id}>
-                      <td>{index + 1}</td>
-                      <td>{task.task_name}</td>
-                      <td>{task.description}</td>
-                      <td>{task.category_name}</td>
-                      <td>{task.status}</td>
-                      <td>{task.priority}</td>
-                      <td>{task.due_date}</td>
-                        <td>
-                            {/* Tambah tombol edit dengan fungsi onClick */}
-                            <Button variant="light" className="text-info" onClick={() => handleEdit(task.task_id)}>
-                            Edit
-                            </Button>
-                            {' '}
-                            {/* Tambah tombol delete dengan fungsi onClick */}
-                            <Button variant="light" className="text-danger" onClick={() => handleDelete(task.task_id)}>
-                            Delete
-                            </Button>
-                        </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+            {jobs.length > 0 ? (
+              jobs.map((job, index) => (
+                <Card key={job.application_id} className="mb-3">
+                  <Card.Body>
+                    <Card.Title>{job.job_title}</Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">Position: {job.position_name}</Card.Subtitle>
+                    <Card.Text>
+                      <strong>Company:</strong> {job.company_name}<br />
+                      <strong>Status:</strong> {job.status}<br />
+                      <strong>Company Sector:</strong> {job.companysector_name}<br />
+                      <strong>Application Date:</strong> {job.application_date}
+                    </Card.Text>
+                    <Button variant="info" className="mr-2" onClick={() => handleEdit(job.application_id)}>
+                      Edit
+                    </Button>
+                    <Button variant="danger" onClick={() => handleDelete(job.application_id)}>
+                      Delete
+                    </Button>
+                  </Card.Body>
+                </Card>
+              ))
             ) : (
-              <p>No tasks available.</p>
+              <p>No jobs available.</p>
             )}
         </Col>
 

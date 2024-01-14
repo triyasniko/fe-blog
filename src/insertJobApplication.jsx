@@ -5,14 +5,15 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Container, Row, Col, Table, Form, Button } from 'react-bootstrap';
 
-const InsertTask = () => {
-    const [taskName, setTaskName] = useState('');
-    const [description, setDescription] = useState('');
-    const [categoryOptions, setCategoryOptions] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('');
+const InsertJobApplication = () => {
+    const [jobTitle, setJobTitle] = useState('');
+    const [companyName, setCompanyName] = useState('');
+    const [positionOptions, setPositionOptions] = useState([]);
+    const [selectedPosition, setSelectedPosition] = useState('');
+    const [companySectorOptions, setCompanySectorOptions] = useState([]);
+    const [selectedCompanySectorOptions, setSelectedCompanySectorOptions] = useState('');
+    const [applicationDate, setApplicationDate]=useState('');
     const [status, setStatus]=useState('');
-    const [priority, setPriority] = useState('');
-    const [dueDate, setDueDate] = useState('');
     const navigate=useNavigate();
     const location = useLocation();
     const [user, setUser] = useState(null);
@@ -39,10 +40,25 @@ const InsertTask = () => {
 
     useEffect(() => {
         fetchDataUser();
-        // Ambil data kategori dari endpoint
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/category`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/position`, {
+            headers: {
+              'Authorization': `Bearer ${access_token}`
+            }
+        })
           .then(response => {
-            setCategoryOptions(response.data.data);
+            setPositionOptions(response.data.data);
+          })
+          .catch(error => {
+            console.error('Error fetching position:', error);
+          });
+        // Ambil data kategori dari endpoint
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/company`, {
+            headers: {
+              'Authorization': `Bearer ${access_token}`
+            }
+        })
+          .then(response => {
+            setCompanySectorOptions(response.data.data);
           })
           .catch(error => {
             console.error('Error fetching categories:', error);
@@ -55,19 +71,19 @@ const InsertTask = () => {
 
         const newData = {
             user_id:user.user_id,
-            task_name:taskName,
-            description:description,
-            category_id: selectedCategory,
-            priority:priority,
-            due_date:dueDate,
+            job_title:jobTitle,
+            company_name:companyName,
+            position_id:selectedPosition,
+            companysector_id: selectedCompanySectorOptions,
+            application_date:applicationDate,
             status:status, // Atur status sesuai kebutuhan
           };
-        // console.log(newData);
+        console.log("###########",newData);
                 
         try {
             // Melakukan operasi INSERT ke tabel tasks
             const response = await axios.post(
-            `${process.env.REACT_APP_API_BASE_URL}/task`,
+            `${process.env.REACT_APP_API_BASE_URL}/job`,
             newData,
             {
                 headers: {
@@ -81,23 +97,6 @@ const InsertTask = () => {
             if (response.status >= 200 && response.status < 300) {
             // Mendapatkan task_id yang baru saja diinsert
                 console.log("#########",response.data.data);
-                const task_id = response.data.data.id; // Menggunakan response.data.insertId sesuai dengan struktur response yang diharapkan
-                console.log(task_id,"#########");
-                
-                // Melakukan operasi INSERT ke tabel task_categories
-                await axios.post(
-                    `${process.env.REACT_APP_API_BASE_URL}/task-category`,
-                    {
-                        task_id: task_id,
-                        category_id: selectedCategory,
-                    },
-                    {
-                        headers: {
-                        'Authorization': `Bearer ${access_token}`
-                        }
-                    }
-                );
-    
                 // Menampilkan SweetAlert
                 Swal.fire({
                 title: 'Success!',
@@ -124,44 +123,63 @@ const InsertTask = () => {
         <Container>
             <form onSubmit={handleSubmit} className="mt-4">
                 <div className="mb-3">
-                    <label htmlFor="taskName" className="form-label">
-                        Task Name:
+                    <label htmlFor="jobTitle" className="form-label">
+                        Job Title:
                     </label>
                     <input
                         type="text"
                         className="form-control"
-                        id="taskName"
-                        value={taskName}
-                        onChange={(e) => setTaskName(e.target.value)}
+                        id="jobTitle"
+                        value={jobTitle}
+                        onChange={(e) => setJobTitle(e.target.value)}
                     />
                 </div>
-
                 <div className="mb-3">
-                    <label htmlFor="description" className="form-label">
-                        Description:
+                    <label htmlFor="companyName" className="form-label">
+                        Company Name:
                     </label>
-                    <textarea
+                    <input
+                        type="text"
                         className="form-control"
-                        id="description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        id="companyName"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
                     />
                 </div>
 
                 <div className="mb-3">
-                    <label htmlFor="category" className="form-label">
-                        Category:
+                    <label htmlFor="position" className="form-label">
+                        Position:
                     </label>
                     <select
                         className="form-select"
-                        id="category"
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        id="Position"
+                        value={selectedPosition}
+                        onChange={(e) => setSelectedPosition(e.target.value)}
                     >
-                        <option value="">Select Category</option>
-                        {categoryOptions.map((category) => (
-                            <option key={category.category_id} value={category.category_id}>
-                                {category.category_name}
+                        <option value="">Select Position</option>
+                        {positionOptions.map((position) => (
+                            <option key={position.position_id} value={position.position_id}>
+                                {position.position_name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="mb-3">
+                    <label htmlFor="companysector" className="form-label">
+                        Company Sector:
+                    </label>
+                    <select
+                        className="form-select"
+                        id="companysector"
+                        value={selectedCompanySectorOptions}
+                        onChange={(e) => setSelectedCompanySectorOptions(e.target.value)}
+                    >
+                        <option value="">Select Company Sector</option>
+                        {companySectorOptions.map((companySector) => (
+                            <option key={companySector.companysector_id} value={companySector.companysector_id}>
+                                {companySector.companysector_name}
                             </option>
                         ))}
                     </select>
@@ -179,38 +197,21 @@ const InsertTask = () => {
                     >
                         <option value="">Select Status</option>
                         <option value="pending">Pending</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="completed">Completed</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
                     </select>
                 </div>
 
                 <div className="mb-3">
-                    <label htmlFor="priority" className="form-label">
-                        Priority:
-                    </label>
-                    <select
-                        className="form-select"
-                        id="priority"
-                        value={priority}
-                        onChange={(e) => setPriority(e.target.value)}
-                    >
-                        <option value="">Select Priority</option>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-
-                <div className="mb-3">
-                    <label htmlFor="dueDate" className="form-label">
-                        Due Date:
+                    <label htmlFor="applicationDate" className="form-label">
+                        Application Date:
                     </label>
                     <input
                         type="date"
                         className="form-control"
-                        id="dueDate"
-                        value={dueDate}
-                        onChange={(e) => setDueDate(e.target.value)}
+                        id="applicationDate"
+                        value={applicationDate}
+                        onChange={(e) => setApplicationDate(e.target.value)}
                     />
                 </div>
                 
@@ -226,4 +227,4 @@ const InsertTask = () => {
     );
 };
 
-export default InsertTask;
+export default InsertJobApplication;
