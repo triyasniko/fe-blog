@@ -5,15 +5,13 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Container, Row, Col, Table, Form, Button } from 'react-bootstrap';
 
-const InsertJobApplication = () => {
-    const [jobTitle, setJobTitle] = useState('');
-    const [companyName, setCompanyName] = useState('');
-    const [positionOptions, setPositionOptions] = useState([]);
-    const [selectedPosition, setSelectedPosition] = useState('');
-    const [companySectorOptions, setCompanySectorOptions] = useState([]);
-    const [selectedCompanySectorOptions, setSelectedCompanySectorOptions] = useState('');
-    const [applicationDate, setApplicationDate]=useState('');
-    const [status, setStatus]=useState('');
+const InsertArticle = () => {
+    const [articleTitle, setArticleTitle] = useState('');
+    const [articleDescription, setArticleDescription] = useState('');
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [tagOptions, setTagOptions] = useState([]);
+    const [selectedTagOptions, setSelectedTagOptions] = useState('');
     const navigate=useNavigate();
     const location = useLocation();
     const [user, setUser] = useState(null);
@@ -40,28 +38,28 @@ const InsertJobApplication = () => {
 
     useEffect(() => {
         fetchDataUser();
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/position`, {
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/category`, {
             headers: {
               'Authorization': `Bearer ${access_token}`
             }
         })
           .then(response => {
-            setPositionOptions(response.data.data);
-          })
-          .catch(error => {
-            console.error('Error fetching position:', error);
-          });
-        // Ambil data kategori dari endpoint
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/company`, {
-            headers: {
-              'Authorization': `Bearer ${access_token}`
-            }
-        })
-          .then(response => {
-            setCompanySectorOptions(response.data.data);
+            setCategoryOptions(response.data.data);
           })
           .catch(error => {
             console.error('Error fetching categories:', error);
+          });
+        // Ambil data kategori dari endpoint
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tag`, {
+            headers: {
+              'Authorization': `Bearer ${access_token}`
+            }
+        })
+          .then(response => {
+            setTagOptions(response.data.data);
+          })
+          .catch(error => {
+            console.error('Error fetching tags:', error);
           });
     }, []);
 
@@ -71,19 +69,17 @@ const InsertJobApplication = () => {
 
         const newData = {
             user_id:user.user_id,
-            job_title:jobTitle,
-            company_name:companyName,
-            position_id:selectedPosition,
-            companysector_id: selectedCompanySectorOptions,
-            application_date:applicationDate,
-            status:status, // Atur status sesuai kebutuhan
+            article_title:articleTitle,
+            article_description:articleDescription,
+            category_id:selectedCategory,
+            tag_id: selectedTagOptions
           };
         console.log("###########",newData);
                 
         try {
             // Melakukan operasi INSERT ke tabel tasks
             const response = await axios.post(
-            `${process.env.REACT_APP_API_BASE_URL}/job`,
+            `${process.env.REACT_APP_API_BASE_URL}/article`,
             newData,
             {
                 headers: {
@@ -123,96 +119,66 @@ const InsertJobApplication = () => {
         <Container>
             <form onSubmit={handleSubmit} className="mt-4">
                 <div className="mb-3">
-                    <label htmlFor="jobTitle" className="form-label">
-                        Job Title:
+                    <label htmlFor="articleTitle" className="form-label">
+                        Article Title:
                     </label>
                     <input
                         type="text"
                         className="form-control"
-                        id="jobTitle"
-                        value={jobTitle}
-                        onChange={(e) => setJobTitle(e.target.value)}
+                        id="articleTitle"
+                        value={articleTitle}
+                        onChange={(e) => setArticleTitle(e.target.value)}
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="companyName" className="form-label">
-                        Company Name:
+                    <label htmlFor="articleDescription" className="form-label">
+                        Description:
                     </label>
                     <input
                         type="text"
                         className="form-control"
-                        id="companyName"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
+                        id="articleDescription"
+                        value={articleDescription}
+                        onChange={(e) => setArticleDescription(e.target.value)}
                     />
                 </div>
 
                 <div className="mb-3">
                     <label htmlFor="position" className="form-label">
-                        Position:
+                        Category:
                     </label>
                     <select
                         className="form-select"
-                        id="Position"
-                        value={selectedPosition}
-                        onChange={(e) => setSelectedPosition(e.target.value)}
+                        id="Category"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
                     >
-                        <option value="">Select Position</option>
-                        {positionOptions.map((position) => (
-                            <option key={position.position_id} value={position.position_id}>
-                                {position.position_name}
+                        <option value="">Select Category</option>
+                        {categoryOptions.map((category) => (
+                            <option key={category.category_id} value={category.category_id}>
+                                {category.category_name}
                             </option>
                         ))}
                     </select>
                 </div>
 
                 <div className="mb-3">
-                    <label htmlFor="companysector" className="form-label">
-                        Company Sector:
+                    <label htmlFor="tag" className="form-label">
+                        Tag:
                     </label>
                     <select
                         className="form-select"
-                        id="companysector"
-                        value={selectedCompanySectorOptions}
-                        onChange={(e) => setSelectedCompanySectorOptions(e.target.value)}
+                        id="tag"
+                        value={selectedTagOptions}
+                        onChange={(e) => setSelectedTagOptions(e.target.value)}
                     >
-                        <option value="">Select Company Sector</option>
-                        {companySectorOptions.map((companySector) => (
-                            <option key={companySector.companysector_id} value={companySector.companysector_id}>
-                                {companySector.companysector_name}
+                        <option value="">Select Tag</option>
+                        {tagOptions.map((tag) => (
+                            <option key={tag.tag_id} value={tag.tag_id}>
+                                {tag.tag_name}
                             </option>
                         ))}
                     </select>
-                </div>
-                
-                <div className="mb-3">
-                    <label htmlFor="status" className="form-label">
-                        Status:
-                    </label>
-                    <select
-                        className="form-select"
-                        id="status"
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                    >
-                        <option value="">Select Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="accepted">Accepted</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
-                </div>
-
-                <div className="mb-3">
-                    <label htmlFor="applicationDate" className="form-label">
-                        Application Date:
-                    </label>
-                    <input
-                        type="date"
-                        className="form-control"
-                        id="applicationDate"
-                        value={applicationDate}
-                        onChange={(e) => setApplicationDate(e.target.value)}
-                    />
                 </div>
                 
                 <button type="submit" className="btn btn-primary">
@@ -227,4 +193,4 @@ const InsertJobApplication = () => {
     );
 };
 
-export default InsertJobApplication;
+export default InsertArticle;

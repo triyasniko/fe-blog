@@ -70,7 +70,6 @@ const Login = () => {
 
   return (
     <>
-    <NavLoginRegister />
     <div className="container mt-5">
       <div className="col-md-6 offset-md-3">
         <h2 className="mb-4">Login</h2>
@@ -87,6 +86,7 @@ const Login = () => {
         </form>
       </div>
     </div>
+    <NavLoginRegister />
     </>
   );
 };

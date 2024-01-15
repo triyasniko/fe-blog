@@ -102,7 +102,6 @@ const Register = () => {
 
   return (
     <>
-    <NavLoginRegister />
     <div className="container mt-5">
       <div className="col-md-6 offset-md-3">
         <h2 className="mb-4">Register</h2>
@@ -123,6 +122,7 @@ const Register = () => {
         </form>
       </div>
     </div>
+    <NavLoginRegister />
     </>
   );
 };

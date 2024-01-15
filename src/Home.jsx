@@ -3,14 +3,14 @@ import { Container, Row, Col, Table, Form, Button, Card } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import NavbarDefault from './NavbarDefault';
-import InsertJobApplication from './insertJobApplication';
+import InsertArticle from './InsertArticle';
 import Swal from 'sweetalert2';
 
 const Home = () => {
     const navigate = useNavigate();
     const access_token = localStorage.getItem("access_token");
     const [user, setUser] = useState(null);
-    const [jobs, setJobs] = useState([]);
+    const [articles, setArticles] = useState([]);
 
     const fetchDataUser = async () => {
         try {
@@ -31,32 +31,32 @@ const Home = () => {
             // You might want to redirect or handle the error in a way that makes sense for your application
         }
     };
-    const fetchDataJobs = async () => {
+    const fetchDataArticle = async () => {
         try {
             // console.log(`Bearer ${access_token}`);
             const response = await axios({
                 Accept: 'application/json',
-                url: `${process.env.REACT_APP_API_BASE_URL}/job`,
+                url: `${process.env.REACT_APP_API_BASE_URL}/article`,
                 method: 'get',
                 headers: {
                     'Authorization': `Bearer ${access_token}`
                 }
             });
-             setJobs(response.data.data);
+             setArticles(response.data.data);
              console.log("disiniiii####",response.data);
         } catch (error) {
             // Handle errors, e.g., log the error or show a user-friendly message
-            console.error("Error fetching jobs data:", error);
+            console.error("Error fetching articles data:", error);
             // You might want to redirect or handle the error in a way that makes sense for your application
         }
     };
-    const handleDelete = (applicationId) => {
+    const handleDelete = (articleId) => {
         // Tampilkan konfirmasi sebelum menghapus
-        const confirmDelete = window.confirm("Are you sure you want to delete this job?");
+        const confirmDelete = window.confirm("Are you sure you want to delete this article?");
     
         if (confirmDelete) {
-            // Implementasi logika penghapusan job di sini
-            axios.delete(`${process.env.REACT_APP_API_BASE_URL}/job/${applicationId}`, {
+            // Implementasi logika penghapusan article di sini
+            axios.delete(`${process.env.REACT_APP_API_BASE_URL}/article/${articleId}`, {
                 headers: {
                   'Authorization': `Bearer ${access_token}`
                 }
@@ -65,15 +65,15 @@ const Home = () => {
                 // Tampilkan SweetAlert setelah penghapusan berhasil
                 Swal.fire({
                   icon: 'success',
-                  title: 'Job Deleted!',
-                  text: `Job with ID ${applicationId} has been successfully deleted.`,
+                  title: 'Article Deleted!',
+                  text: `Article with ID ${articleId} has been successfully deleted.`,
                 })
                 .then(() => {
                     // setJobs(prevJobs => prevJobs.filter(job => job.application_id !== applicationId));
-                    setJobs(prevJobs => {
-                      const updatedJobs = prevJobs.filter(job => job.application_id !== applicationId);
-                      console.log('Updated Jobs:', updatedJobs);
-                      return updatedJobs;
+                    setArticles(prevArticles => {
+                      const updatedArticles = prevArticles.filter(article => article.article_id !== articleId);
+                      console.log('Updated Articles:', updatedArticles);
+                      return updatedArticles;
                     });
                     
                     navigate('/');
@@ -83,20 +83,20 @@ const Home = () => {
               })
               .catch(error => {
                 // Tangani kesalahan saat melakukan permintaan atau kesalahan dari server
-                console.error('Error during job deletion:', error.message);
+                console.error('Error during article deletion:', error.message);
       
                 // Tampilkan SweetAlert jika terjadi kesalahan
                 Swal.fire({
                   icon: 'error',
                   title: 'Error',
-                  text: 'An error occurred during job deletion.',
+                  text: 'An error occurred during article deletion.',
                 });
               });
         }
       };
-      const handleEdit = (applicationId) => {
+      const handleEdit = (articleId) => {
         // console.log(applicationId,"#@#@#@#@#@@#");
-        navigate(`/editJobApplication/${applicationId}`);
+        navigate(`/editArticle/${articleId}`);
       };
     //hook useEffect
     useEffect(() => {
@@ -108,7 +108,7 @@ const Home = () => {
         }
         //call function "fetchData"
         fetchDataUser();
-        fetchDataJobs();
+        fetchDataArticle();
     }, []);
     //console.log(user,"#############");
   return (
@@ -119,36 +119,35 @@ const Home = () => {
         <Col md={12}>
             <Link className="btn btn-sm btn-light mb-1 border-secondary" 
             to={{
-                pathname: '/insertJobApplication',
+                pathname: '/insertArticle',
                 state: { user: user }
               }}
             
             >
-                Insert Job Application
+                Insert  Article
             </Link>
-            {jobs.length > 0 ? (
-              jobs.map((job, index) => (
-                <Card key={job.application_id} className="mb-3">
+            {articles.length > 0 ? (
+              articles.map((article, index) => (
+                <Card key={article.article_id} className="mb-3">
                   <Card.Body>
-                    <Card.Title>{job.job_title}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">Position: {job.position_name}</Card.Subtitle>
+                    <Card.Title>{article.article_title}</Card.Title>
                     <Card.Text>
-                      <strong>Company:</strong> {job.company_name}<br />
-                      <strong>Status:</strong> {job.status}<br />
-                      <strong>Company Sector:</strong> {job.companysector_name}<br />
-                      <strong>Application Date:</strong> {job.application_date}
+                      <p> {article.article_description}</p>
+                      <span className="text-white bg-secondary px-1">
+                        {article.category_name}
+                      </span>
                     </Card.Text>
-                    <Button variant="info" className="mr-2" onClick={() => handleEdit(job.application_id)}>
+                    <Button variant="outline-info" className="btn-sm mr-2" onClick={() => handleEdit(article.article_id)}>
                       Edit
                     </Button>
-                    <Button variant="danger" onClick={() => handleDelete(job.application_id)}>
+                    <Button variant="outline-danger" className="btn-sm" onClick={() => handleDelete(article.article_id)}>
                       Delete
                     </Button>
                   </Card.Body>
                 </Card>
               ))
             ) : (
-              <p>No jobs available.</p>
+              <p>No articles available.</p>
             )}
         </Col>
 
